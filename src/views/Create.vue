@@ -17,13 +17,11 @@
         </div>
         <div class="form__field">
           <div class="form__field-input">
-            <p for="list" class="form__label">
-              You checklist (press the enter)
-            </p>
+            <p for="list" class="form__label">Affairs (press the enter)</p>
             <input
               v-model="item"
               v-on:keyup.enter="createListItem()"
-              placeholder="Item"
+              placeholder="Affairs"
               type="text"
               class="form__input"
             />
@@ -123,6 +121,7 @@ export default {
           name: this.name,
           affairs: this.list,
           description: this.description,
+          status: "active",
         };
         this.ADD_ITEM_IN_LIST_ACTIONS(task);
         this.$router.push("/");

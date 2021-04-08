@@ -12,6 +12,9 @@
               <p class="list__content-list-item-text">Name</p>
             </div>
             <div class="list__content-list-item">
+              <p class="list__content-list-item-text">Status</p>
+            </div>
+            <div class="list__content-list-item">
               <p class="list__content-list-item-text">Affairs</p>
             </div>
             <div class="list__content-list-item description">
@@ -41,9 +44,14 @@
               </p>
             </div>
             <div class="list__content-list-item">
-              <ul class="list__content-list-affairs">
+              <p class="list__content-list-item-text">
+                {{ item.status }}
+              </p>
+            </div>
+            <div class="list__content-list-item">
+              <ul class="list__content-list-affairs" v-if="item.affairs">
                 <div
-                  v-show="index <= 2"
+                  v-show="index <= 0"
                   class="list__content-list-affairs-item"
                   v-for="(item, index) in item.affairs"
                   :key="index"
@@ -53,28 +61,32 @@
                   </p>
                   <p class="list__content-list-affairs-text">{{ item }}</p>
                 </div>
-                <span v-show="index >= 1">Остальные пункты в Change</span>
+                <span v-show="+item.affairs.length >= 2"
+                  >Остальные пункты в Change</span
+                >
               </ul>
             </div>
             <div class="list__content-list-item description">
               <p class="list__content-list-item-text">
                 {{ item.description }}
               </p>
-              <span>...</span>
             </div>
             <div class="list__content-list-item list__content-list-item_btn">
               <p
                 class="list__content-list-item-btn list__content-list-item-btn_blue"
+                :class="{ active: item.status == 'Complete' }"
+                @click="comlpleteTask(item.id)"
               >
                 Сomplete
               </p>
             </div>
             <div class="list__content-list-item list__content-list-item_btn">
-              <p
+              <router-link
+                :to="'/task/' + item.id"
                 class="list__content-list-item-btn list__content-list-item-btn_blue"
               >
                 Change
-              </p>
+              </router-link>
             </div>
             <div class="list__content-list-item list__content-list-item_btn">
               <p
@@ -126,7 +138,10 @@ export default {
     ...mapGetters(["TASK_LIST"]),
   },
   methods: {
-    ...mapActions(["DELETE_ITEM_IN_LIST_ACTIONS"]),
+    ...mapActions([
+      "DELETE_ITEM_IN_LIST_ACTIONS",
+      "COMPLETE_ITEM_IN_LIST_ACTIONS",
+    ]),
     closePopup() {
       const allPopups = document.querySelectorAll(".list__popup");
       for (let popup of allPopups) {
@@ -147,10 +162,12 @@ export default {
         this.isShowPopup = false;
       }
     },
+    comlpleteTask(id) {
+      this.COMPLETE_ITEM_IN_LIST_ACTIONS(id);
+    },
   },
   mounted() {
     this.$nextTick(() => {
-      console.log(this.TASK_LIST);
       const allItems = document.querySelectorAll(".description");
       for (let item of allItems) {
         if (item.offsetHeight >= 80) {
@@ -190,9 +207,12 @@ export default {
       max-width: 30px;
     }
     &:nth-child(2) {
-      max-width: 150px;
+      max-width: 100px;
     }
     &:nth-child(3) {
+      max-width: 100px;
+    }
+    &:nth-child(4) {
       max-width: 250px;
     }
     &:last-child {
@@ -208,6 +228,10 @@ export default {
   &__content-list-item-text {
     font-size: 18px;
     line-height: 20px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 450px;
   }
   &__content-list-affairs {
     span {
@@ -235,6 +259,10 @@ export default {
     cursor: pointer;
     font-size: 16px;
     line-height: 18px;
+    &.active {
+      background-color: #a6a4a4;
+      cursor: default;
+    }
     &_red {
       background-color: #ff2929;
     }
@@ -242,20 +270,7 @@ export default {
       background-color: #6fb6f7;
     }
   }
-  .description {
-    span {
-      display: none;
-    }
-    &.active {
-      p {
-        height: 80px;
-        overflow: hidden;
-      }
-      span {
-        display: block;
-      }
-    }
-  }
+
   &__popup {
     z-index: 3;
     display: none;
